@@ -10,4 +10,5 @@ var (
 
 	ErrNoTransition        = errors.New("no transition for state+event")
 	ErrDuplicateTransition = errors.New("duplicate transition for state+event")
+	ErrIllegalTransition   = errors.New("illegal transition")
 )
