@@ -69,12 +69,12 @@ func (m *Machine) Register(t Transition) error {
 		return ErrInvalidTransition
 	}
 
-	k := key(t.From, t.On)
+	k := key(t.From, t.On) // <-- MUST use normalized fields
 	if _, exists := m.transitions[k]; exists {
 		return ErrDuplicateTransition
 	}
 
-	m.transitions[k] = t
+	m.transitions[k] = t // <-- store normalized t
 	return nil
 }
 

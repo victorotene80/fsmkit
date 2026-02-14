@@ -96,7 +96,7 @@ func TestMachine_Next_NormalizesInputs(t *testing.T) {
 		To:   State("SUBMITTED"),
 	})
 
-	next, _, err := m.Next("tx_1", State(" pending "), Event(" submit "), time.Now(), nil, nil)
+	next, _, err := m.Next("tx_1", State(" PENDING "), Event(" SUBMIT "), time.Now(), nil, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
