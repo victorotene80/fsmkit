@@ -10,7 +10,8 @@ type Transition struct {
 	On   Event
 	To   State
 
-	Name string
+	Name  string
+	Guard Guard // optional
 }
 
 func (t Transition) Normalize() Transition {
@@ -40,7 +41,8 @@ type TransitionLog struct {
 	From      State
 	On        Event
 	To        State
-	At        time.Time
+
+	At time.Time
 
 	Meta map[string]string
 
