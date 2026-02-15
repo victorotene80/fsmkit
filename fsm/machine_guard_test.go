@@ -104,3 +104,41 @@ func TestMachine_Next_NormalizesInputs(t *testing.T) {
 		t.Fatalf("expected SUBMITTED got %s", next)
 	}
 }
+
+func TestTransitionLog_MetaIsCloned(t *testing.T) {
+	m := MustNewMachine("x")
+	m.MustRegister(Transition{From: "A", On: "GO", To: "B"})
+
+	meta := map[string]string{"k": "v"}
+	_, log, err := m.Next("id1", "A", "GO", time.Now(), meta, nil)
+	if err != nil {
+		t.Fatalf("unexpected: %v", err)
+	}
+
+	meta["k"] = "hacked"
+
+	if log.Meta["k"] != "v" {
+		t.Fatalf("expected meta to be cloned")
+	}
+}
+
+func TestTransitionLog_CanonicalStringDeterministic(t *testing.T) {
+	at := time.Date(2026, 2, 15, 0, 0, 0, 0, time.UTC)
+
+	l1 := TransitionLog{
+		From: "A", On: "GO", To: "B",
+		At:      at,
+		Meta:    map[string]string{"b": "2", "a": "1"},
+		Allowed: true, Reason: ReasonOK,
+	}
+	l2 := TransitionLog{
+		From: "A", On: "GO", To: "B",
+		At:      at,
+		Meta:    map[string]string{"a": "1", "b": "2"},
+		Allowed: true, Reason: ReasonOK,
+	}
+
+	if l1.CanonicalString() != l2.CanonicalString() {
+		t.Fatalf("expected canonical string to match")
+	}
+}

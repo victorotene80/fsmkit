@@ -1,6 +1,7 @@
 package fsm
 
 import (
+	"sort"
 	"strings"
 	"time"
 )
@@ -48,4 +49,52 @@ type TransitionLog struct {
 
 	Allowed bool
 	Reason  ReasonCode
+}
+
+func (l TransitionLog) CanonicalMetaPairs() []string {
+	if len(l.Meta) == 0 {
+		return nil
+	}
+	keys := make([]string, 0, len(l.Meta))
+	for k := range l.Meta {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	out := make([]string, 0, len(keys))
+	for _, k := range keys {
+		out = append(out, k+"="+l.Meta[k])
+	}
+	return out
+}
+
+func (l TransitionLog) CanonicalString() string {
+	// deterministic string; no spaces; fixed field order
+	// time is RFC3339Nano in UTC
+	var b strings.Builder
+	b.Grow(128)
+
+	b.WriteString("from=")
+	b.WriteString(l.From.String())
+	b.WriteString("|on=")
+	b.WriteString(l.On.String())
+	b.WriteString("|to=")
+	b.WriteString(l.To.String())
+	b.WriteString("|at=")
+	b.WriteString(l.At.UTC().Format(time.RFC3339Nano))
+	b.WriteString("|allowed=")
+	if l.Allowed {
+		b.WriteString("1")
+	} else {
+		b.WriteString("0")
+	}
+	b.WriteString("|reason=")
+	b.WriteString(string(l.Reason))
+
+	pairs := l.CanonicalMetaPairs()
+	for _, p := range pairs {
+		b.WriteString("|m=")
+		b.WriteString(p)
+	}
+	return b.String()
 }

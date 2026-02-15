@@ -127,10 +127,10 @@ func (m *Machine) Next(
 	from = from.Normalize()
 	on = on.Normalize()
 
+	machineID = strings.TrimSpace(machineID) // optional but recommended
+
 	at = at.UTC()
-	if meta == nil {
-		meta = map[string]string{}
-	}
+	meta = cloneMeta(meta)
 
 	// validate inputs
 	if !from.Valid() {
